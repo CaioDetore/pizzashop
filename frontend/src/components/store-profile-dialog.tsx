@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { getManagedRestaurant } from "@/api/get-manage-restaurant";
+import { updateProfile } from "@/api/update-profile";
 
 import { Button } from "./ui/button";
 import {
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -29,15 +32,37 @@ export function StoreProfileDialog() {
     useQuery({
       queryKey: ["managedRestaurant"],
       queryFn: getManagedRestaurant,
+      staleTime: Infinity,
     });
 
-  const { register } = useForm<StoreProfileSchema>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<StoreProfileSchema>({
     resolver: zodResolver(storeProfileSchema),
     values: {
       name: managedRestaurant?.name ?? "",
       description: managedRestaurant?.description ?? "",
     },
   });
+
+  const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile,
+  });
+
+  async function handleUpdateProfile(data: StoreProfileSchema) {
+    try {
+      await updateProfileFn({
+        name: data.name,
+        description: data.description,
+      });
+
+      toast.success("Perfil atualizado com sucesso!");
+    } catch (err) {
+      toast.success("Falha ao atualizar perfil. Tente novamente.");
+    }
+  }
 
   return (
     <DialogContent>
@@ -47,7 +72,7 @@ export function StoreProfileDialog() {
           Atualize as informações do seu estabelecimento visíveis ao seu cliente
         </DialogDescription>
 
-        <form action="">
+        <form onSubmit={handleSubmit(handleUpdateProfile)}>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right" htmlFor="name">
@@ -69,10 +94,14 @@ export function StoreProfileDialog() {
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" type="button">
-              Cancelar
+            <DialogClose asChild>
+              <Button variant="ghost" type="button">
+                Cancelar
+              </Button>
+            </DialogClose>
+            <Button disabled={isSubmitting} variant="success" type="submit">
+              Salvar
             </Button>
-            <Button variant="success">Cancelar</Button>
           </DialogFooter>
         </form>
       </DialogHeader>
