@@ -19,14 +19,24 @@ import { OrderTableRow } from "./order-table-row";
 export function Orders() {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const orderId = searchParams.get("orderId");
+  const customerName = searchParams.get("customerName");
+  const status = searchParams.get("status");
+
   const pageIndex = z.coerce
     .number()
     .transform((page) => page - 1)
     .parse(searchParams.get("page") ?? "1");
 
   const { data: result } = useQuery({
-    queryKey: ["orders", pageIndex],
-    queryFn: () => getOrders({ pageIndex }),
+    queryKey: ["orders", pageIndex, orderId, customerName, status],
+    queryFn: () =>
+      getOrders({
+        pageIndex,
+        orderId,
+        customerName,
+        status: status === "all" ? null : status,
+      }),
   });
 
   function handlePaginate(pageIndex: number) {
@@ -62,7 +72,7 @@ export function Orders() {
               </TableHeader>
               <TableBody>
                 {result &&
-                  result.data.orders.map((order) => {
+                  result.orders.map((order) => {
                     return <OrderTableRow key={order.orderId} order={order} />;
                   })}
               </TableBody>
@@ -72,9 +82,9 @@ export function Orders() {
           {result && (
             <Pagination
               onPageChange={handlePaginate}
-              pageIndex={result.data.meta.pageIndex}
-              perPage={result.data.meta.perPage}
-              totalCount={result.data.meta.totalCount}
+              pageIndex={result.meta.pageIndex}
+              perPage={result.meta.perPage}
+              totalCount={result.meta.totalCount}
             />
           )}
         </div>
