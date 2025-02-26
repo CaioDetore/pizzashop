@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { formatDistance, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { getOrderDetails } from "@/api/get-order-details";
