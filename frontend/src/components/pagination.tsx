@@ -67,7 +67,7 @@ export function Pagination({
             variant="outline"
             className="h-8 w-8 p-0"
             disabled={pages <= pageIndex + 1}
-            onClick={() => onPageChange(totalCount - 1)}
+            onClick={() => onPageChange(totalCount / perPage - 1)}
           >
             <ChevronsRight className="h-4 w-4" />
             <span className="sr-only">Última página</span>
