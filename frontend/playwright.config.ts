@@ -4,6 +4,7 @@ import { env } from "./src/env";
 
 export default defineConfig({
   testDir: "./test",
+  testMatch: /.*\.e2e-spec\.ts$/,
   fullyParallel: true,
   // forbidOnly: !!env.CI,
   // retries: env.CI ? 2 : 0,
