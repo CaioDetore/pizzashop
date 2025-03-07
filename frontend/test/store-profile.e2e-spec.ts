@@ -17,15 +17,11 @@ test("update profile successfully", async ({ page }) => {
 
   const toast = page.getByText("Perfil atualizado com sucesso!");
 
-  expect(toast).toBeVisible();
+  await expect(toast).toBeVisible();
 
   await page.getByRole("button", { name: "Close" }).click();
 
   const newButton = page.getByRole("button", { name: "Rocket Pizza" });
 
-  await page.waitForTimeout(250);
-
-  expect(newButton).toBeVisible();
-
-  await page.waitForTimeout(2);
+  await expect(newButton).toBeVisible();
 });
